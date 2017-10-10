@@ -1,3 +1,12 @@
+'''
+    File name: rc4.py
+    Author: Manzoor Ahmed 
+          : Pierre Vachon
+    Date created: 10/10/2017
+    Date last modified: 10/10/2017
+    Python Version: 3.6
+    Version 1.0
+'''
 
 import os
 import binascii
