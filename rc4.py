@@ -47,185 +47,121 @@ def initPermutationOfS():
         print('Permuted S: ',s)
 
 # Encrypt M byte of data with stream key
-def encrypt(data,key,filename):
+def encrypt(data,key):
 
-        data_to_int = int(data)
-
-        xor = data_to_int ^ int(key)
-
+        
+        data_to_int = int(data,16)
+        xor = data_to_int ^ key
+        
         encrypted_hex = hex(xor)
+        print ('encode',encrypted_hex.encode())
+        
+        print(encrypted_hex)
+        return encrypted_hex
 
-        # Write hex value to file 
-        writeToFile(filename, encrypted_hex,'enc')
 
 # Decrypt
-def decrypt(data,key,filename):
+def decrypt(data,key):
 
-        data_to_int = int(data,16)
-
+        data_to_int = int(data.strip(),16)
         xor = data_to_int ^ key
-
-        decrypted_hex = str(xor)
-
-        # Write hex value to file 
-        writeToFile(filename, decrypted_hex,'dec')
         
-
-# Write M byte of data to file
-def writeToFile(filename,data,command):
-
-        # Encrypt 
-        if command== 'enc':
+        print('xored value', xor)
+        to_hex = hex(xor)
         
-                # Change file extension
-                file_with_ext = filename + '.encrypted'
+        print('to_hex', to_hex)
+        
+        decrypted = binascii.unhexlify(to_hex.strip())
+        
+        print ('decrypted value:', decrypted)
 
-                #print(file_with_ext)
-                # Open if exists, otherwise create new
-                with io.open(file_with_ext, 'wb' ) as ef:
-                        ef.write(data)
-                        #print bytearray(data)
-                ef.close()
-
-        # Decrypt
-        if command == 'dec':
-                file_with_original_ext = filename.replace('.encrypted','')
-                
-                try:
-                        with io.open(file_with_original_ext, 'wb' ) as ef:
-                                ef.write(data.encoding('utf-8'))
-                        ef.close()
-                except IOError as e:
-                        print('I/O Error!')
-                except ValueError as va:
-                        print('Could not convert dec data data')
-                except:
-                        print('Unknown Error') 
-                
+        return binascii.unhexlify(str(to_hex)[2:])
+                    
 # Open data stream from file, or any other type of data
-def encryptStreamData(streamData):
-        try:
-                with io.open(streamData,"rb") as f:
-        
+def streamData(streamData,command):
+
+        if command is 'encrypt':
+                with open(streamData,'rb') as f:
                         a = 0
                         b = 0 
 
                         while True:
 
                                 # Extract a block of 8 bytes from streamData to encrpt
-
-                                #chunk = binascii.hexlify(f.read(1))
-                                chunk = f.read(8)
-                                print chunk
-                                #chunk = chunk.decode()
-                                print chunk
-        
+                                byte = f.read(8)
+                                print('data',byte)
+                                chunk = binascii.hexlify(byte)                
                                 if not chunk:
                                         break
+                                else:
+                                        # Keep generating key 
+                                        a = ( a + 1 ) % 256
+                                        b = ( b + s[b] )  % 256
+                                        swap( s[ a ], s[ b ])
+                                        te = ( s[ a ] + s[ b ] ) % 256
 
-                                # Keep generating key 
-                                a = ( a + 1 ) % 256
-                                b = ( b + s[b] )  % 256
-                                swap( s[ a ], s[ b ])
-                                te = ( s[ a ] + s[ b ] ) % 256
+                                        # Encryption key
+                                        round_key = s[te]
+                                        print(round_key)
 
-                                # Encryption key
-                                round_key = s[te]
-
-                                # Encrypt chunk with stream key
-                                print 'starts encrypting...'
-                                encrypt(chunk,round_key,f.name)
-
-                        # Done encrypted, clean up
-
-                        #deleteFileContent(streamData)
-                        #print 'data deleted, now just a shell!'
-
-                        f.close()
-                        
-                        try:
-                                # Double check encrypted file exists
-                                with io.open(f.name + '.encrypted','rb') as encrypted_f:
-                                        if encrypted_f:
-                                                print('Done hacker!')
-                                                print('Encrypted content -> ', encrypted_f.name)
-                                        encrypted_f.close()
-                                        
-                        except IOError as e:
-                                print('I/O')
-                        except ValueError as ve:
-                                print('Value Err')
-                                print(sys.exc_info()[0])
-                        except:
-                                print('Unknown Error!')
-                                raise
-        
-        except IOError as e:
-                print('I/O Error!')
-        except ValueError as va:
-                print('Could not convert enc data')
-                print(sys.exc_info()[0])
-        except:
-                print('Unknown Error')
-                raise
-
-def decryptStreamData(streamData):
-
-        try:
-                with io.open(streamData,"rb") as f:
-
-                        a = 0
-                        b = 0
-
-                        while True:
-
-                                # Extract a block of 1 byte from streamData to encrpt
-
-                                chunk = binascii.hexlify(f.read(1))
-
-                                if not chunk:
-                                        break
-
-                                # Keep generating key 
-                                a = ( a + 1 ) % 256
-                                b = ( b + s[b] )  % 256
-                               
-                                swap( s[ a ], s[ b ])
-                                te = ( s[ a ] + s[ b ] ) % 256
-
-                                # Encryption key
-                                round_key = s[te]
-
-                                # Encrypt chunk with stream key
-
-                                decrypt(chunk,round_key,f.name)
-                                
-                # Done, clsoe file        
+                                        # Encrypt chunk with stream key
+                                        print ('encrypting...')
+                                        encrpted_chunk = encrypt(chunk,round_key)
+                                        # Change file extension
+                                        file_with_ext = streamData + '.encrypted'
+                                        # Append data
+                                        with open(file_with_ext, 'ab+' ) as bf:
+                                                bf.write(encrpted_chunk)
+                                                bf.close()
                 f.close()
-                        
-        except IOError as e:
-                print('I/O Error!')
-        except ValueError as va:
-                print('Could not convert dect data')
-        except:
-                print('Unknown Error')
-                raise
-        
-initializeStateVector()
-print()
-print()
+                
+        if command is 'decrypt':
+                with open(streamData,'rb') as fe:
+                        a = 0
+                        b = 0 
+                        while True:
+                                # Extract a block of 18 bytes from streamData to decrypt
+                                data = fe.read(18)
+                                if not data:
+                                        break
+                                else:
+                                        # Keep generating key
+                                       
+                                        a = ( a + 1 ) % 256
+                                        b = ( b + s[b] )  % 256
+                                        swap( s[ a ], s[ b ])
+                                        te = ( s[ a ] + s[ b ] ) % 256
 
+                                        # Decryption key
+                                        round_key = s[te]
+
+                                        print(round_key)
+
+                                        # Decrypt chunk with stream key
+                                        #print ('dencrypting...')
+                                        decrypt_chunk = decrypt(data,round_key)
+                                        print(decrypt_chunk)
+                                        # Change file extension
+                                        file_with_ext = streamData
+                                        # Append data
+                                        #with open(file_with_ext, 'wb+' ) as bf:
+                                                #bf.write(decrypt_chunk)
+                                                #bf.close()
+
+                fe.close()        
+initializeStateVector()
 initPermutationOfS()
-#initializeStateVector()
-print()
-print()
 
 # File to encrypt, needs abosolute path with extension
-encryptStreamData('/Users/user/Desktop/e.docx')
+streamData('/Users/user/Desktop/BITS.py','encrypt')
 
+s =[]
+t = []
+initializeStateVector()
+initPermutationOfS()
 
-# File to decrypt, needs absolute path with .encrypted extension
-# decryptStreamData('/Users/user/Desktop/e.docx.encrypted')
+streamData('/Users/user/Desktop/BITS.py.encrypted','decrypt')
+
 
         
     
