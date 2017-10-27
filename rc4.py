@@ -48,34 +48,41 @@ def initPermutationOfS():
 
 # Encrypt M byte of data with stream key
 def encrypt(data,key):
-
         
         data_to_int = int(data,16)
-        xor = data_to_int ^ key
+        
+        xor = data_to_int ^ int(key)
         
         encrypted_hex = hex(xor)
-        print ('encode',encrypted_hex.encode())
-        
-        print(encrypted_hex)
-        return encrypted_hex
 
+        encrypt_hex = binascii.hexlify(encrypted_hex)
+        
+        return encrypted_hex
 
 # Decrypt
 def decrypt(data,key):
+              
+        # key
+        dec_val = int(data,16) ^ int(key)
 
-        data_to_int = int(data.strip(),16)
-        xor = data_to_int ^ key
-        
-        print('xored value', xor)
-        to_hex = hex(xor)
-        
-        print('to_hex', to_hex)
-        
-        decrypted = binascii.unhexlify(to_hex.strip())
-        
-        print ('decrypted value:', decrypted)
+        to_hex = hex(dec_val)
 
-        return binascii.unhexlify(str(to_hex)[2:])
+        try:
+
+                if to_hex.endswith('L'):
+                        original_val = binascii.unhexlify(to_hex[2:len(to_hex) -1 ].strip())
+                        #print('**',original_val)
+                else:
+                        original_val = binascii.unhexlify(to_hex[2:])
+
+                #print original_val.decode('hex')
+        except binascii.Error as be:
+                print('data error!', be)
+        except binascii.Incomplete as bi:
+                print('incomplete data error!', bi)
+                
+        return original_val
+
                     
 # Open data stream from file, or any other type of data
 def streamData(streamData,command):
@@ -84,13 +91,14 @@ def streamData(streamData,command):
                 with open(streamData,'rb') as f:
                         a = 0
                         b = 0 
-
+                        f.seek(0)
                         while True:
 
                                 # Extract a block of 8 bytes from streamData to encrpt
                                 byte = f.read(8)
-                                print('data',byte)
-                                chunk = binascii.hexlify(byte)                
+                               
+                                chunk = binascii.hexlify(byte)
+                                
                                 if not chunk:
                                         break
                                 else:
@@ -102,13 +110,14 @@ def streamData(streamData,command):
 
                                         # Encryption key
                                         round_key = s[te]
-                                        print(round_key)
+                                        #print(round_key)
 
                                         # Encrypt chunk with stream key
-                                        print ('encrypting...')
+                                        #print ('encrypting...', chunk)
                                         encrpted_chunk = encrypt(chunk,round_key)
                                         # Change file extension
                                         file_with_ext = streamData + '.encrypted'
+                                        
                                         # Append data
                                         with open(file_with_ext, 'ab+' ) as bf:
                                                 bf.write(encrpted_chunk)
@@ -118,10 +127,13 @@ def streamData(streamData,command):
         if command is 'decrypt':
                 with open(streamData,'rb') as fe:
                         a = 0
-                        b = 0 
+                        b = 0
+                        fe.seek(0)
                         while True:
                                 # Extract a block of 18 bytes from streamData to decrypt
                                 data = fe.read(18)
+                                
+                                #print('reading dec data',data)
                                 if not data:
                                         break
                                 else:
@@ -140,27 +152,36 @@ def streamData(streamData,command):
                                         # Decrypt chunk with stream key
                                         #print ('dencrypting...')
                                         decrypt_chunk = decrypt(data,round_key)
-                                        print(decrypt_chunk)
+                                        
+                                        #print(decrypt_chunk)
+                                        
                                         # Change file extension
                                         file_with_ext = streamData
-                                        # Append data
-                                        #with open(file_with_ext, 'wb+' ) as bf:
-                                                #bf.write(decrypt_chunk)
-                                                #bf.close()
 
+                                        # Get pathname
+                                        abspath = os.path.dirname(file_with_ext)
+                                        basename = os.path.basename(file_with_ext)
+                                        copy = '/Copy_' + basename.replace('.encrypted','')
+
+                                        newpath = abspath + copy
+                                        print(newpath)
+                                        # Append data
+                                        with open(newpath, 'ab+' ) as bf:
+                                                bf.write(decrypt_chunk)
+                                                bf.close()
                 fe.close()        
 initializeStateVector()
 initPermutationOfS()
 
 # File to encrypt, needs abosolute path with extension
-streamData('/Users/user/Desktop/BITS.py','encrypt')
+streamData('/Users/user/Desktop/lorem.txt','encrypt')
 
 s =[]
 t = []
 initializeStateVector()
 initPermutationOfS()
 
-streamData('/Users/user/Desktop/BITS.py.encrypted','decrypt')
+streamData('/Users/user/Desktop/lorem.txt.encrypted','decrypt')
 
 
         
