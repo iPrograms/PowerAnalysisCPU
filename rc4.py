@@ -9,11 +9,47 @@
 '''
 
 import os
-import io
+import psutil as ps
 import binascii
 import sys
 import psutil
 import base64
+from stats import CPUStat, MemoryStat, HardDriveStat
+from numpy import arange
+from matplotlib.pyplot import figure,show
+
+# Graph ticks
+time_xy = arange(0.0,256,1.0)
+
+# Graph figure
+s_key_figure = figure(1)
+
+# graphs
+cpu = s_key_figure.add_subplot(313)
+key = s_key_figure.add_subplot(211)
+
+# Y axis 0, to 10
+cpu.set_ylim(0,2)
+key.set_ylim(0,256)
+
+cpu.set_xlim(0,256)
+key.set_xlim(0,256)
+
+# Show grid 
+cpu.grid(True)
+key.grid(True)
+
+
+# Labels
+cpu.set_ylabel('Time')
+cpu.set_xlabel('Value')
+cpu.set_title('CPU Usage')
+
+
+key.set_ylabel('Key')
+key.set_xlabel('Round')
+key.set_title('Key Generation')
+
 
 # Initialization vector [0,1,...256]
 s = []
@@ -29,6 +65,7 @@ def initializeStateVector():
                 s.append(i)
                 # Expand key to the same lenth as S
                 t.append(int(k[i % len(k) ]))
+                
         print('S: ',s)
 
 # Swap S data for permutaion
@@ -37,14 +74,21 @@ def swap(i,j):
 	s[i] = s[j]
 	s[j] = temp
 
+	
+
 def initPermutationOfS():
         j=0
         
         for x in range(0,256):
             j = ( j + int(s[j]) + int(t[j]) ) % 256
             swap(s[x],s[j])
-            
+
         print('Permuted S: ',s)
+
+def plotKey():
+        for x in range(0,256):
+                key.plot(x,s[x])
+                
 
 # Encrypt M byte of data with stream key
 def encrypt(data,key):
@@ -173,9 +217,11 @@ def streamData(streamData,command):
 initializeStateVector()
 initPermutationOfS()
 
+plotKey()
 # File to encrypt, needs abosolute path with extension
 streamData('/Users/user/Desktop/lorem.txt','encrypt')
 
+show()
 s =[]
 t = []
 initializeStateVector()
@@ -184,7 +230,99 @@ initPermutationOfS()
 streamData('/Users/user/Desktop/lorem.txt.encrypted','decrypt')
 
 
-        
+'''
+if __name__ == "__main__":
+
+    # CPU 
+    s = CPUStat()
+
+    # Memory
+    m = MemoryStat()
+
     
+    
+#x values and ticks
+t = arange(0.0, 100.0,1.0)
+
+fig = figure(1)
+
+ax1 = fig.add_subplot(111)
+
+ax1.set_ylim((0,1.5))
+
+ax1.grid(True)
+
+for x in range(0,100):
+
+    # Collect CPU stat
+    # percpu = True, if want to collect all cpus data
+    process = ps.Process(os.getpid())
+    u = process.cpu_percent(interval=True)
+    s.addCPUInterval(u)
+    s.addTimeInterval(x)
+
+    # Current process' memory usage
+    mem = process.memory_percent()
+    m.collectMemoryData(mem)
+    m.collectTimerData(x)
+    print(mem)
+
+    #print(ps.disk_usage('/Users/user/Desktop/CloudDust/graph.py'))
+    
+print (s.getCPUdata())
+print (s.getCPUtimeData())
+
+
+-	solid line style
+--	dashed line style
+-.	dash-dot line style
+:	dotted line style
+.	point marker
+,	pixel marker
+o	circle marker
+v	triangle_down marker
+^	triangle_up marker
+<	triangle_left marker
+>	triangle_right marker
+1	tri_down marker
+2	tri_up marker
+3	tri_left marker
+4	tri_right marker
+s	square marker
+p	pentagon marker
+*	star marker
+h	hexagon1 marker
+H	hexagon2 marker
++	plus marker
+x	x marker
+D	diamond marker
+d	thin_diamond marker
+|	vline marker
+_	hline marker
+
+
+# Graph cpu data
+ax1.plot(s.getCPUtimeData(),s.getCPUdata(),'-o')
+
+# Graph memory data
+ax1.plot(m.getCollectedTime(),m.getCollectedMemData(), '--')
+
+
+# Labels 
+ax1.set_ylabel('Usage')
+ax1.set_xlabel('Time')
+ax1.set_title('RC4')
+
+#color x labels
+for label in ax1.get_xticklabels():
+    label.set_color('green')
+#color y labels
+for label2 in ax1.get_yticklabels():
+    label2.set_color('green')
+
+
+
+show()'''
+
 
 
