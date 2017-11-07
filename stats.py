@@ -77,7 +77,7 @@ class HardDriveStat:
     def addAccessTime(self,time):
         self.time.append(time)
 
-    def get access(self):
+    def getaccess(self):
         return self.access
 
     def getAccessTime(self):

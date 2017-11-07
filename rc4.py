@@ -1,3 +1,4 @@
+#!/usr/bin/env python2.7
 '''
     File name: rc4.py
     Author: Manzoor Ahmed 
@@ -9,14 +10,20 @@
 '''
 
 import os
+import sys
 import psutil as ps
 import binascii
-import sys
 import psutil
 import base64
+from args import InputChecker
 from stats import CPUStat, MemoryStat, HardDriveStat
 from numpy import arange
 from matplotlib.pyplot import figure,show
+
+
+# Argv
+
+inputchecker = InputChecker()
 
 # Graph ticks
 time_xy = arange(0.0,256,1.0)
@@ -56,7 +63,6 @@ s = []
 
 # Private key to initialy permute initialization vector S
 k = '12139757927403241289018348180751234973456123041823903030394848210389384746819101838437128191'
-
 t = []
 
 # Populate S with data 0,...256
@@ -73,8 +79,6 @@ def swap(i,j):
 	temp = s[i]
 	s[i] = s[j]
 	s[j] = temp
-
-	
 
 def initPermutationOfS():
         j=0
@@ -131,7 +135,7 @@ def decrypt(data,key):
 # Open data stream from file, or any other type of data
 def streamData(streamData,command):
 
-        if command is 'encrypt':
+        if(command is '-e') or ( command is '-E'):
                 with open(streamData,'rb') as f:
                         a = 0
                         b = 0 
@@ -168,7 +172,7 @@ def streamData(streamData,command):
                                                 bf.close()
                 f.close()
                 
-        if command is 'decrypt':
+        if (command is '-d') or (command is '-D'):
                 with open(streamData,'rb') as fe:
                         a = 0
                         b = 0
@@ -213,21 +217,32 @@ def streamData(streamData,command):
                                         with open(newpath, 'ab+' ) as bf:
                                                 bf.write(decrypt_chunk)
                                                 bf.close()
-                fe.close()        
-initializeStateVector()
-initPermutationOfS()
+                fe.close()
 
-plotKey()
-# File to encrypt, needs abosolute path with extension
-streamData('/Users/user/Desktop/lorem.txt','encrypt')
 
-show()
-s =[]
-t = []
-initializeStateVector()
-initPermutationOfS()
 
-streamData('/Users/user/Desktop/lorem.txt.encrypted','decrypt')
+
+if inputchecker.processCommand() == True:
+        k = sys.argv[3]
+        print(sys.argv[3])
+        initializeStateVector()
+        initPermutationOfS()
+
+        stream = sys.argv[5]
+        command = sys.argv[2]
+        
+
+        plotKey()
+        # File to encrypt, needs abosolute path with extension
+        streamData(sys.argv[5],sys.argv[2])
+
+        show()
+        s =[]
+        t = []
+        initializeStateVector()
+        initPermutationOfS()
+
+        streamData('/Users/user/Desktop/lorem.txt.encrypted','decrypt')
 
 
 '''
