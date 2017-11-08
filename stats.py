@@ -10,12 +10,6 @@
     Version 1.0
 '''
 
-from matplotlib.pyplot import figure, show
-from numpy import arange
-import psutil as ps
-import os
-
-
 # CPU Statistics
 class CPUStat:
 

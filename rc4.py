@@ -15,15 +15,25 @@ import psutil as ps
 import binascii
 import psutil
 import base64
+import time
 from args import InputChecker
 from stats import CPUStat, MemoryStat, HardDriveStat
 from numpy import arange
 from matplotlib.pyplot import figure,show
 
+# Current process
+proc = psutil.Process(os.getpid())
 
-# Argv
+cpustate = CPUStat()
+percpu = False
+interval = True
 
-inputchecker = InputChecker()
+
+# Memory
+memstate = MemoryStat()
+
+# Hard Drive
+drive = HardDriveStat()
 
 # Graph ticks
 time_xy = arange(0.0,256,1.0)
@@ -52,27 +62,39 @@ cpu.set_ylabel('Time')
 cpu.set_xlabel('Value')
 cpu.set_title('CPU Usage')
 
-
 key.set_ylabel('Key')
 key.set_xlabel('Round')
 key.set_title('Key Generation')
 
 
-# Initialization vector [0,1,...256]
-s = []
-
-# Private key to initialy permute initialization vector S
-k = '12139757927403241289018348180751234973456123041823903030394848210389384746819101838437128191'
-t = []
+# Start monitoring cpu usage of this process
+# Start monitoring memory usage of this process
+# Start monitoring hard drive access
 
 # Populate S with data 0,...256
-def initializeStateVector():
-        for i in range(0,256):
-                s.append(i)
-                # Expand key to the same lenth as S
-                t.append(int(k[i % len(k) ]))
-                
-        print('S: ',s)
+def initializeStateVector(s,k,cpu=False):
+        t = []
+        # Need to capture system information
+        if cpu == True:
+                for i in range(0,256):
+                        s.append(i)
+                        # Expand key to the same lenth as S
+                        t.append(int(k[i % len(k) ]))
+
+                        # Capture cpu usage
+                        cpustate.addCPUInterval(proc.cpu_percent(interval))
+                        cpustate.addTimeInterval(i)
+                        # Capture mem usage
+                        memstate.collectMemoryData(proc.memory_percent())
+                        memstate.collectTimerData(i)
+                        # Capture drive access                
+        else:
+                for i in range(0,256):
+                        s.append(i)
+                        # Expand key to the same lenth as S
+                        t.append(int(k[i % len(k) ]))                
+                #print('S: ',s)
+        return t
 
 # Swap S data for permutaion
 def swap(i,j):
@@ -80,73 +102,61 @@ def swap(i,j):
 	s[i] = s[j]
 	s[j] = temp
 
-def initPermutationOfS():
+def initPermutationOfS(s):
         j=0
-        
         for x in range(0,256):
             j = ( j + int(s[j]) + int(t[j]) ) % 256
             swap(s[x],s[j])
+        #print('Permuted S: ',s)
 
-        print('Permuted S: ',s)
-
-def plotKey():
+def plotOriginalS(s):
         for x in range(0,256):
-                key.plot(x,s[x])
-                
+                key.plot(x,s[x],'+')
+def plotPermutedS(ps):
+        for x in range(0,256):
+                key.plot(x,ps[x],'s')
+def plotT(t):
+        for x in range(0,256):
+                key.plot(x,t[x],'^')
 
 # Encrypt M byte of data with stream key
 def encrypt(data,key):
-        
         data_to_int = int(data,16)
-        
         xor = data_to_int ^ int(key)
-        
         encrypted_hex = hex(xor)
-
         encrypt_hex = binascii.hexlify(encrypted_hex)
-        
         return encrypted_hex
 
 # Decrypt
 def decrypt(data,key):
-              
         # key
         dec_val = int(data,16) ^ int(key)
-
         to_hex = hex(dec_val)
-
         try:
-
                 if to_hex.endswith('L'):
                         original_val = binascii.unhexlify(to_hex[2:len(to_hex) -1 ].strip())
                         #print('**',original_val)
                 else:
                         original_val = binascii.unhexlify(to_hex[2:])
-
                 #print original_val.decode('hex')
         except binascii.Error as be:
                 print('data error!', be)
         except binascii.Incomplete as bi:
                 print('incomplete data error!', bi)
-                
         return original_val
 
-                    
 # Open data stream from file, or any other type of data
-def streamData(streamData,command):
-
-        if(command is '-e') or ( command is '-E'):
+def streamData(command,key,streamData):
+        #print(streamData,command,key)
+        if(command == '-e') or ( command == '-E'):
                 with open(streamData,'rb') as f:
                         a = 0
                         b = 0 
                         f.seek(0)
                         while True:
-
                                 # Extract a block of 8 bytes from streamData to encrpt
                                 byte = f.read(8)
-                               
                                 chunk = binascii.hexlify(byte)
-                                
                                 if not chunk:
                                         break
                                 else:
@@ -164,7 +174,7 @@ def streamData(streamData,command):
                                         #print ('encrypting...', chunk)
                                         encrpted_chunk = encrypt(chunk,round_key)
                                         # Change file extension
-                                        file_with_ext = streamData + '.encrypted'
+                                        file_with_ext = streamData +  '.encrypted'
                                         
                                         # Append data
                                         with open(file_with_ext, 'ab+' ) as bf:
@@ -172,21 +182,20 @@ def streamData(streamData,command):
                                                 bf.close()
                 f.close()
                 
-        if (command is '-d') or (command is '-D'):
+        elif (command == '-d') or (command == '-D'):
                 with open(streamData,'rb') as fe:
                         a = 0
                         b = 0
                         fe.seek(0)
+                        now = time.strftime("%x@%X")
                         while True:
                                 # Extract a block of 18 bytes from streamData to decrypt
                                 data = fe.read(18)
-                                
                                 #print('reading dec data',data)
                                 if not data:
                                         break
                                 else:
                                         # Keep generating key
-                                       
                                         a = ( a + 1 ) % 256
                                         b = ( b + s[b] )  % 256
                                         swap( s[ a ], s[ b ])
@@ -194,56 +203,61 @@ def streamData(streamData,command):
 
                                         # Decryption key
                                         round_key = s[te]
-
                                         print(round_key)
 
                                         # Decrypt chunk with stream key
                                         #print ('dencrypting...')
                                         decrypt_chunk = decrypt(data,round_key)
-                                        
                                         #print(decrypt_chunk)
-                                        
                                         # Change file extension
                                         file_with_ext = streamData
-
+                                        print(file_with_ext)
                                         # Get pathname
-                                        abspath = os.path.dirname(file_with_ext)
+                                        abspath = os.path.abspath(file_with_ext)
+                                        print(abspath)
                                         basename = os.path.basename(file_with_ext)
-                                        copy = '/Copy_' + basename.replace('.encrypted','')
-
-                                        newpath = abspath + copy
+                                        copy = abspath.replace(basename,'') + 'Copy_' + basename.replace('.encrypted','')
+                                        print(copy)
+                                        newpath = copy
                                         print(newpath)
                                         # Append data
                                         with open(newpath, 'ab+' ) as bf:
                                                 bf.write(decrypt_chunk)
                                                 bf.close()
                 fe.close()
+        else:
+                print('unknown command! Did you want to use with -e or -E option?')
 
+# Validate input first                
+inpch = InputChecker()
 
+#print(len(sys.argv))
 
+if inpch.processCommand(sys.argv) == True:
 
-if inputchecker.processCommand() == True:
+        sysInfo = False
+
+        # Are we monitoring system info?
+        if len(sys.argv) == 7:
+                sysInfo = True
+
         k = sys.argv[3]
-        print(sys.argv[3])
-        initializeStateVector()
-        initPermutationOfS()
+        s = []
+         
+        t = initializeStateVector(s,k,sysInfo)
+        plotOriginalS(s)
+        
+        initPermutationOfS(s)
+        plotPermutedS(s)
 
+        plotT(t)
         stream = sys.argv[5]
         command = sys.argv[2]
-        
-
-        plotKey()
+       
         # File to encrypt, needs abosolute path with extension
-        streamData(sys.argv[5],sys.argv[2])
-
+        streamData(sys.argv[1],sys.argv[2],sys.argv[5])
+       
         show()
-        s =[]
-        t = []
-        initializeStateVector()
-        initPermutationOfS()
-
-        streamData('/Users/user/Desktop/lorem.txt.encrypted','decrypt')
-
 
 '''
 if __name__ == "__main__":

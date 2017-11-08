@@ -19,18 +19,28 @@ class InputChecker:
         self.command = None
         self.validKey = False
         self.extension = False
-        
+
+    def arevalidArgs(self):
+        if ( self.validArgs == True ) and ( self.validKey == True) and ( self.extension == True):
+            return True
+        else:
+            return False
+    
     def printUsage(self):
-        print'rc4.py   General Commands Manual'
+        print'+----------------------------------------------+'
         print''
-        print'NAME'
-        print'rc4.py'
+        print' rc4.py   General Commands Manual'
         print''
-        print'usage: rc4.py [-eEdD][-k][-file file]'
+        print' NAME'
+        print' rc4.py'
         print''
-        print'optional arguments:'
-        print'-h, --help  show this help message and exit'
+        print' Usage: rc4.py [-eEdD][-k][-f file]'
         print''
+        print' Optional arguments:'
+        print' -h, --help  show this help message and exit'
+        print' -sys, -system monitors system resources'
+        print''
+        print'+-----------------------------------------------+'
 
     def checkKey(self,k):
         if k.isdigit():
@@ -38,56 +48,71 @@ class InputChecker:
         else:
             return False
         
-    def processCommand(self):
+    def processCommand(self, args):
         valid = False
-        if len(self.argv) == 1:
+        if len(args) == 1:
             print('No arguments supplied!')
             
-        elif len(self.argv) == 2:
-            if self.argv[1] != "":
-                if  ( self.argv[1] == '-h' )  or ( self.argv[1] == '--help' ):
+        elif len(args) == 2:
+            if args[1] != "":
+                if  ( args[1] == '-h' )  or ( args[1] == '--help' ):
                     self.printUsage()
-                elif self.argv[1] == '-e' or self.argv[1] == '-E':
+                elif args[1] == '-e' or args[1] == '-E':
                     self.command = 'encrypt'
                     print(self.command)
-                elif self.argv[1] == '-d' or self.argv[1] == '-D':
+                elif args[1] == '-d' or args[1] == '-D':
                     self.command = 'decrypt'
                     print(self.command)
-        elif len(self.argv) == 3:
-            if ( self.argv[2] == '-k' )  or ( self.argv[2] == '--key' ) :
-                print(self.argv[2])
+        elif len(args) == 3:
+            if ( args[2] == '-k' )  or ( args[2] == '--key' ) :
+                print(args[2])
             else:
                 print 'Usage: did you want to run with -k option?'
                 self.printUsage()
-        elif len(self.argv) == 4:
-            if (self.argv[3]) != "":
-                if self.checkKey(self.argv[3]) == True:
+        elif len(args) == 4:
+            if (args[3]) != "":
+                if self.checkKey(args[3]) == True:
                     self.validKey = True
-                    print(self.argv[3])
+                    print(args[3])
                 else:
                     print 'Invalid Key'
-        elif len(self.argv) == 5:
-            if self.argv[4] != "":
-                if ( self.argv[4] == '-f' ) or ( self.argv[4]  == '--file' ):
+        elif len(args) == 5:
+            if args[4] != "":
+                if ( args[4] == '-f' ) or ( args[4]  == '--file' ):
                     print self.argv[4]
                 else:
                     print 'No Stream data provided!'
-        elif len(self.argv) == 6:
-            if ((self.argv[4] == '-f') or (self.argv[4] == '-file')) and (self.checkKey(self.argv[3]) == True)  and \
-               ((self.argv[2] == '-k' )  or ( self.argv[2] == '--key')) and ((self.argv[1] == '-e' or self.argv[1] == '-E') or (self.argv[1] == '-d' or self.argv[1] == '-D')):
-                if(self.argv[5] != ""):
-                   if self.argv[5].find(".") > 0:
+        elif len(args) == 6:
+            if ((args[4] == '-f') or (args[4] == '-file')) and (self.checkKey(args[3]) == True)  and \
+               ((args[2] == '-k' )  or ( args[2] == '--key')) and ((args[1] == '-e' or args[1] == '-E') or  (args[1] == '-d' or args[1] == '-D')):
+                if(args[5] != ""):
+                   if args[5].find(".") > 0:
                       self.extension = True
                       self.validArgs = True
-                      print 'valid command!'
-                      valid = True                      
+                      print 'valid command'
+                      return True
                    else:
                       print 'Invalid extension'
             else:
                 print 'invalid command'
+        # -sys, -system        
+        elif len(args) == 7:
+            if ((args[4] == '-f') or (args[4] == '-file')) and (self.checkKey(args[3]) == True)  and \
+               ((args[2] == '-k' )  or ( args[2] == '--key')) and ((args[1] == '-e' or args[1] == '-E') or  (args[1] == '-d' or args[1] == '-D')):
+                if(args[5] != ""):
+                   if args[5].find(".") > 0:
+                      self.extension = True
+                      if (args[6] != ""):
+                          if(args[6] == '-sys') or (args[6]) == '-system':
+                              self.validArgs = True
+                              print 'valid command with monitoring system resources'
+                              return True
+                          else:
+                              print 'Invalid argument' + args[6]
+                   else:
+                      print 'Invalid extension'
         else:
-
             print 'Unknown args found!'
-            return valid
+    
         
    
