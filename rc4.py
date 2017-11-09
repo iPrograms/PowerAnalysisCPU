@@ -26,7 +26,7 @@ proc = psutil.Process(os.getpid())
 
 cpustate = CPUStat()
 percpu = False
-interval = True
+interval = False
 
 
 # Memory
@@ -46,7 +46,7 @@ cpu = s_key_figure.add_subplot(313)
 key = s_key_figure.add_subplot(211)
 
 # Y axis 0, to 10
-cpu.set_ylim(0,2)
+cpu.set_ylim(0,256)
 key.set_ylim(0,256)
 
 cpu.set_xlim(0,256)
@@ -72,10 +72,10 @@ key.set_title('Key Generation')
 # Start monitoring hard drive access
 
 # Populate S with data 0,...256
-def initializeStateVector(s,k,cpu=False):
+def initializeStateVector(s,k,monitor=False):
         t = []
         # Need to capture system information
-        if cpu == True:
+        if monitor == True:
                 for i in range(0,256):
                         s.append(i)
                         # Expand key to the same lenth as S
@@ -87,7 +87,7 @@ def initializeStateVector(s,k,cpu=False):
                         # Capture mem usage
                         memstate.collectMemoryData(proc.memory_percent())
                         memstate.collectTimerData(i)
-                        # Capture drive access                
+                        # Capture drive access TODO               
         else:
                 for i in range(0,256):
                         s.append(i)
@@ -102,11 +102,24 @@ def swap(i,j):
 	s[i] = s[j]
 	s[j] = temp
 
-def initPermutationOfS(s):
+def initPermutationOfS(s,monitor=False):
         j=0
-        for x in range(0,256):
-            j = ( j + int(s[j]) + int(t[j]) ) % 256
-            swap(s[x],s[j])
+        if monitor == True:
+                for x in range(0,256):
+                    j = ( j + int(s[j]) + int(t[j]) ) % 256
+                    swap(s[x],s[j])
+                    # Capture cpu usage
+                    cpustate.addCPUInterval(proc.cpu_percent(interval))
+                    cpustate.addTimeInterval(x)
+                    # Capture mem usage
+                    memstate.collectMemoryData(proc.memory_percent())
+                    memstate.collectTimerData(x)
+                    # Capture drive access TODO
+                    
+        else:
+                for x in range(0,256):
+                    j = ( j + int(s[j]) + int(t[j]) ) % 256
+                    swap(s[x],s[j])
         #print('Permuted S: ',s)
 
 def plotOriginalS(s):
@@ -117,7 +130,17 @@ def plotPermutedS(ps):
                 key.plot(x,ps[x],'s')
 def plotT(t):
         for x in range(0,256):
-                key.plot(x,t[x],'^')
+                key.plot(x,t[x],'.')
+
+def plotCPUData(time,data):
+        for x in range(0,len(data)):
+                cpu.plot(time[x],data[x],'x')
+def plotMemoryData(data,time):
+        for x in range(0, len(data)):
+                cpu.plot(time[x],data[x],'x')
+def plotHardDrive(data,time):
+        for x in range(0, len(data)):
+                cpu.plot(time[x],data[x],'--')
 
 # Encrypt M byte of data with stream key
 def encrypt(data,key):
@@ -247,7 +270,7 @@ if inpch.processCommand(sys.argv) == True:
         t = initializeStateVector(s,k,sysInfo)
         plotOriginalS(s)
         
-        initPermutationOfS(s)
+        initPermutationOfS(s,sysInfo)
         plotPermutedS(s)
 
         plotT(t)
@@ -256,7 +279,10 @@ if inpch.processCommand(sys.argv) == True:
        
         # File to encrypt, needs abosolute path with extension
         streamData(sys.argv[1],sys.argv[2],sys.argv[5])
-       
+
+        plotCPUData(cpustate.getCPUtimeData(),cpustate.getCPUdata())
+
+        
         show()
 
 '''

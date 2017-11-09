@@ -108,7 +108,7 @@ class InputChecker:
                               print 'valid command with monitoring system resources'
                               return True
                           else:
-                              print 'Invalid argument' + args[6]
+                              print 'Invalid argument -> ' + args[6]
                    else:
                       print 'Invalid extension'
         else:
