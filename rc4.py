@@ -45,7 +45,7 @@ cpu = s_key_figure.add_subplot(313)
 key = s_key_figure.add_subplot(211)
 
 # Y axis 0, to 10
-cpu.set_ylim(0,1)
+cpu.set_ylim(0,2)
 key.set_ylim(0,256)
 
 cpu.set_xlim(0,6600)
@@ -377,19 +377,17 @@ if inpch.processCommand(sys.argv) == True:
         k = sys.argv[3]
         s = []
 
-        print 'Initializing S...'
+        print ('Initializing S...')
         
-        t = initializeStateVector(s,k,sysInfo)
         a = len(cpustate.getCPUdata())
+        t = initializeStateVector(s,k,sysInfo)
         
         #plotOriginalS(s)
         key.plot(s,'-b', label='S')
         print 'Permuting S...'
 
         b = len(cpustate.getCPUdata()) - a
-        
         initPermutationOfS(s,sysInfo)
-
         c = len(cpustate.getCPUdata()) - b
         
         key.plot(s,'-g', label='Permuted S or T')
@@ -399,25 +397,46 @@ if inpch.processCommand(sys.argv) == True:
         command = sys.argv[2]
        
         # File to encrypt, needs abosolute path with extension
-        print 'Main operation..'
+        print ('Main operation..')
 
         d = len(cpustate.getCPUdata()) - c
-        
         streamData(sys.argv[1],sys.argv[2],sys.argv[5],sysInfo)
-
         e = len(cpustate.getCPUdata()) - d
         
         #plotCPUData(cpustate.getCPUtimeData(),cpustate.getCPUdata())
         
         cpu.plot(cpustate.getCPUdata(), '-r',label='Actual CPU')
-      
-        
         cpu.plot(memstate.getCollectedMemData(), label='Memory')
 
         cpu.legend(loc='upper right')
         key.legend(loc='upper right')
-        print ('time:', len(cpustate.getCPUdata()))
- 
-        print cpustate.getCPUdata()
         
+ 
+        print ('cpu',cpustate.getCPUdata())
+        print ('time:', len(cpustate.getCPUdata()))
+        print ('mem',memstate.getCollectedMemData())
+
+        # Mark operation locations
+        
+        cpu.annotate('Init S', xy=(0, 1), xytext=(0, 2),
+            arrowprops=dict(facecolor='black', shrink=0.01),
+            )
+        #cpu.annotate('End S', xy=(a, 1), xytext=(a+5, 2),
+        #    arrowprops=dict(facecolor='black', shrink=0.01),
+        #    )
+        cpu.annotate('Start Permutaiton', xy=(b, 1), xytext=(b+5, 2),
+            arrowprops=dict(facecolor='black', shrink=0.01),
+            )
+        cpu.annotate('End Permutation', xy=(c, 1), xytext=(c+5, 2),
+            arrowprops=dict(facecolor='black', shrink=0.01),
+            )
+        cpu.annotate('Main Operations', xy=(d, 1), xytext=(d+5, 2),
+            arrowprops=dict(facecolor='black', shrink=0.01),
+            )
+        cpu.annotate('End RC4', xy=(e, 1), xytext=(e+5, 2),
+            arrowprops=dict(facecolor='black', shrink=0.01),
+            )
+  
+        
+
         show()

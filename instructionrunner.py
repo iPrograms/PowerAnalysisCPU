@@ -12,6 +12,7 @@
 #InstructionRunner: Runs the following instructions at a given time
 
 class InstructionRunner:
+
     # Add 10 with a noise value
     def add(self, noisevalue):
         return 10 + noisevalue
@@ -35,16 +36,61 @@ class InstructionRunner:
     # noisevalue raised to self
     def multipSelf(self, noisevalue):
         return noisevalue ** noisevalue
-
-    # Add more...
-
-
-
     
+    def quad(self,noisevalue):
+        return noisevalue + 2 * 4
 
+    def equationOne(self,noisevalue):
+        return noisevalue * 2 - 1
+    
+    def equationTwo(self,noisevalue):
+        return noisevalue * 3 - 1
+    
+    def equationThree(self,noisevalue):
+        return noisevalue * 4 -1 % 10
+    
+    def equationFour(self, noisevalue):
+        return noisevalue + 3 * 2
+    
+    def equationFive(self,noisevalue):
+        return noisevalue **2 % 10
+    
+    def equationSix(self,noisevalue):
+        return noisevalue ** 3 % 10
+    
+    def equationSeven(self, noisevalue):
+        return noisevalue **4 % 10 + 3
+    
+    def equationEight(self,noisevalue):
+        return noisevalue
+    
+    def equationNine(self,noisevalue):
+        return noisevalue * 2 + 1 / 3
+    
+    def equationTen(self,noisevalue):
+        return noisevalue * 6 / 2
+    
+    def equation11(self, noisevalue):
+        return noisevalue + 8 % 4
 
+    def equation12(self, noisevalue):
+        return noisevalue  ** 5 % 10
 
-    # End 
+    def equation13(self, noisevalue):
+        return noisevalue + 9 % 2
+
+    def equation14(self, noisevalue):
+        return 14
+
+    def equation15(self, noisevalue):
+        return noisevalue * 3 % 8
+
+    def equation16(self, noisevalue):
+        return noisevalue ** 10 - noisevalue * 2
+    
+    
+    
+     
 
 
 # Testing...
