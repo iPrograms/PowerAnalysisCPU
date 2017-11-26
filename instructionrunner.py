@@ -88,16 +88,50 @@ class InstructionRunner:
     def equation16(self, noisevalue):
         return noisevalue ** 10 - noisevalue * 2
     
+    def equation17(self, noisevalue):
+        return noisevalue / 2 + 7 * 90 - 12
     
+    def equation18(self, noisevalue):
+        return (noisevalue + noisevalue) % 9
     
-     
+    def equation19(self, noisevalue):
+        return noisevalue **3 / 100 + 3
+    
+    def equation20(self, noisevalue):
+        return noisevalue + 1 % 8
+    
+    def equation21(self, noisevalue):
+        return noisevalue + 1 * 4 % 7
 
+    def equation22(self, noisevalue):
+        return noisevalue / 200
+    
+    def equation23(self, noisevalue):
+        return noisevalue * 3 - 90
+    
+    def equation24(self, noisevalue):
+        return noisevalue * (2 ** 3 % 16 ) + 9
 
-# Testing...
-# Creat InstructionRunner 
-instrunner = InstructionRunner()
+    def equation25(self, noisevalue):
+        return noisevalue + 9 / 23
 
-# Call power with noisevalue 4
-print(instrunner.power2(4))
+    def equation26(self, noisevalue):
+        return noisevalue + 100 / 33 % 12
+
+    def equation27(self, noisevalue):
+        return noisevalue / 12 % 3
+
+    def equation28(self,noisevalue):
+        return noisevalue + 1 % 7 * 12
+
+    def equation29(self, noisevalue):
+        return noisevalue + 3 % 23
+
+    def equation30(self, noisevalue):
+        return noisevalue ** 4 % 4
+    
+    def equation31(self, noisevalue):
+        return noisevalue + 77 / 12 % 9
+    
 
     

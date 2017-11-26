@@ -38,12 +38,13 @@ class InputChecker:
         print''
         print' Optional arguments:'
         print' -h, --help  show this help message and exit'
-        print' -sys, -system monitors system resources'
+        print' -sys, --sytem monitor system resources'
+        print' -n,--noise monitor system resources with added noise'
         print''
         print'+-----------------------------------------------+'
 
     def checkKey(self,k):
-        if k.isdigit():
+        if k.isdigit() and len(k) >8:
             return True
         else:
             return False
@@ -83,7 +84,7 @@ class InputChecker:
                 else:
                     print 'No Stream data provided!'
         elif len(args) == 6:
-            if ((args[4] == '-f') or (args[4] == '-file')) and (self.checkKey(args[3]) == True)  and \
+            if ((args[4] == '-f') or (args[4] == '--file')) and (self.checkKey(args[3]) == True)  and \
                ((args[2] == '-k' )  or ( args[2] == '--key')) and ((args[1] == '-e' or args[1] == '-E') or  (args[1] == '-d' or args[1] == '-D')):
                 if(args[5] != ""):
                    if args[5].find(".") > 0:
@@ -97,13 +98,13 @@ class InputChecker:
                 print 'invalid command'
         # -sys, -system        
         elif len(args) == 7:
-            if ((args[4] == '-f') or (args[4] == '-file')) and (self.checkKey(args[3]) == True)  and \
+            if ((args[4] == '-f') or (args[4] == '--file')) and (self.checkKey(args[3]) == True)  and \
                ((args[2] == '-k' )  or ( args[2] == '--key')) and ((args[1] == '-e' or args[1] == '-E') or  (args[1] == '-d' or args[1] == '-D')):
                 if(args[5] != ""):
                    if args[5].find(".") > 0:
                       self.extension = True
                       if (args[6] != ""):
-                          if(args[6] == '-sys') or (args[6]) == '-system':
+                          if(args[6] == '-sys') or (args[6]) == '--system':
                               self.validArgs = True
                               print 'valid command with monitoring system resources'
                               return True
@@ -111,6 +112,24 @@ class InputChecker:
                               print 'Invalid argument -> ' + args[6]
                    else:
                       print 'Invalid extension'
+        # -n noise       
+        elif len(args) == 8:
+            if ((args[4] == '-f') or (args[4] == '-file')) and (self.checkKey(args[3]) == True)  and \
+               ((args[2] == '-k' )  or ( args[2] == '--key')) and ((args[1] == '-e' or args[1] == '-E') or  (args[1] == '-d' or args[1] == '-D')):
+                if(args[5] != ""):
+                   if args[5].find(".") > 0:
+                      self.extension = True
+                      if (args[6] != ""):
+                          if(args[6] == '-sys') or (args[6]) == '--system':
+                              if(args[7] == '-n') or (args[7] == '--noise'):
+                                  self.validArgs = True
+                                  print 'valid command with monitoring systemd resources with noise'
+                                  return True
+                              else:
+                                  print 'Invalid argument -> ' + args[7]
+                   else:
+                      print 'Invalid extension'
+        
         else:
             print 'Unknown args found!'
     
