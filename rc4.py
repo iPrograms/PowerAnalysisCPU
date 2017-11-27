@@ -4,9 +4,9 @@
     Author: Manzoor Ahmed 
           : Pierre Vachon
     Date created: 10/20/2017
-    Date last modified: 11/15/2017
+    Date last modified: 11/26/2017
     Python Version: 2.7-3.6
-    Version 2.0
+    Version 3.0
 '''
 
 import os
@@ -26,15 +26,15 @@ from matplotlib.pyplot import figure,show
 # Current process
 proc = psutil.Process(os.getpid())
 # private key, degits
-print(sys.argv[3])
-ng = NoiseGenerator(sys.argv[3])
+if len(sys.argv) >=7:
+        ng = NoiseGenerator(sys.argv[3])
 
 cpustate = CPUStat()
 cpunoise = CPUStat()
 
-percpu = False
+percpu  = False
 sysInfo = False
-noise = False
+noise   = False
 
 # Memory
 memstate = MemoryStat()
@@ -56,9 +56,11 @@ noisegraph = s_key_figure.add_subplot(414)
 
 # Y axis 0, to 10
 cpu.set_ylim(0,2)
+noisegraph.set_ylim(0,2)
 key.set_ylim(0,256)
 
-cpu.set_xlim(0,6600)
+cpu.set_xlim(0,8000)
+noisegraph.set_xlim(0,8000)
 key.set_xlim(0,256)
 
 # Show grid 
@@ -259,7 +261,7 @@ def decrypt(data,key, monitor=False,noise=False):
                 collectSystemData()
                 to_hex = hex(dec_val)
 
-                # Don't need to monitor, not part of algorithm
+                # Don't need to monitor, not part of the algorithm
                 try:
                         if to_hex.endswith('L'):
                                 original_val = binascii.unhexlify(to_hex[2:len(to_hex) -1 ].strip())
@@ -273,7 +275,7 @@ def decrypt(data,key, monitor=False,noise=False):
         return original_val
 
 # Open data stream from file, or any other type of data
-def streamData(command,key,streamData,sysInfo,noise=False):
+def streamData(command,key,streamData,sysInfo,noise):
 
         # No monitoring
         if sysInfo == False:
@@ -542,7 +544,7 @@ def streamData(command,key,streamData,sysInfo,noise=False):
                         print('unknown command! Did you want to use with -e or -E option?')
                 
        
-# Validate input first                
+# Validate input                
 inpch = InputChecker()
 
 if inpch.processCommand(sys.argv) == True:
@@ -550,28 +552,27 @@ if inpch.processCommand(sys.argv) == True:
         # Are we monitoring system info?
         if len(sys.argv) == 7:
                 sysInfo = True
-                print(sys.argv[6])
-                
         if len(sys.argv) == 8:
-                noise = True
-                print(noise)
-                print(sys.argv[7])
-                
-        if (sysInfo == True) and (noise==False):
+                noise = True                
+        if (sysInfo == True):
+
                 k = sys.argv[3]
                 s = []
+                
+                print('-------------------------------------------------------------')
+                print('Regular CPU monitoring')
+                print('-------------------------------------------------------------')
 
                 print ('Initializing S...')
                 
                 a = len(cpustate.getCPUdata())
                 t = initializeStateVector(s,k,sysInfo,noise)
-                
-                #plotOriginalS(s)
                 key.plot(s,'-b', label='S')
+        
                 print ('Permuting S...')
-
                 b = len(cpustate.getCPUdata()) - a
                 initPermutationOfS(s,sysInfo,noise)
+                
                 c = len(cpustate.getCPUdata()) - b
                 
                 stream = sys.argv[5]
@@ -580,100 +581,90 @@ if inpch.processCommand(sys.argv) == True:
                 # File to encrypt, needs abosolute path with extension
                 print ('Main operation..')
 
-                d = len(cpustate.getCPUdata()) - c
+                d = len(cpustate.getCPUdata()) - c + 100
 
                 streamData(sys.argv[1],sys.argv[2],sys.argv[5],sysInfo,noise)
 
                 e = len(cpustate.getCPUdata()) - d
                         
                 cpu.plot(cpustate.getCPUdata(), '-r',label='Actual CPU')
-                noisegraph.plot(cpunoise.getCPUdata(), '-r',label='With Noise')
-
                 cpu.legend(loc='upper right')
-                noisegraph.legend(loc='upper right')
-                key.legend(loc='upper right')
-
+                
+                
+                
                 key.plot(s,'-g', label='Permuted S or T')
                 key.plot(t,'-r', label='Expanded Key')
+                key.legend(loc='upper right')
                 
                 # Mark operation locations
                 
-                cpu.annotate('Init S', xy=(0, 1), xytext=(0, 2),
+                cpu.annotate('S', xy=(0, 1), xytext=(0, 2),
                     arrowprops=dict(facecolor='black', shrink=0.01),
                     )
-                cpu.annotate('Start Permutaiton', xy=(b, 1), xytext=(b+5, 2),
+                cpu.annotate('P', xy=(b, 1), xytext=(b+2, 2),
                     arrowprops=dict(facecolor='black', shrink=0.01),
                     )
             
-                cpu.annotate('Main Operations', xy=(d, 1), xytext=(d+5, 2),
+                cpu.annotate('MOP', xy=(d,1), xytext=(d+2, 2),
                     arrowprops=dict(facecolor='black', shrink=0.01),
                     )
-                cpu.annotate('End RC4', xy=(len(cpustate.getCPUdata()), 1), xytext=(e+5, 2),
+                cpu.annotate('E', xy=(len(cpustate.getCPUdata())-10, 1), xytext=(len(cpustate.getCPUdata())-10, 2),
                     arrowprops=dict(facecolor='black', shrink=0.01),
                     )
 
-                print ('cpu',cpustate.getCPUdata())
-                print ('time:', len(cpustate.getCPUdata()))
+                # Regular CPu monitoring Done
 
-                show()
+                #--------------------------------------------------------------
+                # Round 2 with noise
+                # Clean up first
+
+                print('-------------------------------------------------------------')
+                print('CPU With Noise')
+                print('-------------------------------------------------------------')
                 
-        elif (noise == True) and (sysInfo == True):
-              
-                k = sys.argv[3]
                 s = []
 
-                print ('Initializing S...')
+                print ('Initializing S with noise...')
                 
                 a = len(cpunoise.getCPUdata())
-                t = initializeStateVector(s,k,sysInfo,noise)
+                t = initializeStateVector(s,k,True,True)
                 
-                #plotOriginalS(s)
-                key.plot(s,'-b', label='S')
-                print ('Permuting S...')
+                print ('Permuting S with noise...')
 
                 b = len(cpunoise.getCPUdata()) - a
-                initPermutationOfS(s,sysInfo,noise)
+                initPermutationOfS(s,True,True)
                 c = len(cpunoise.getCPUdata()) - b
                 
                 stream = sys.argv[5]
                 command = sys.argv[2]
                
                 # File to encrypt, needs abosolute path with extension
-                print ('Main operation..')
+                print ('Main operation with noise...')
 
-                d = len(cpunoise.getCPUdata()) - c
+                d = len(cpunoise.getCPUdata()) - c + 100 
 
-                streamData(sys.argv[1],sys.argv[2],sys.argv[5],sysInfo,noise)
+                streamData(sys.argv[1],sys.argv[2],sys.argv[5],True,True)
 
                 e = len(cpunoise.getCPUdata()) - d
-                        
-                #cpu.plot(cpunoise.getCPUdata(), '-r',label='Actual CPU')
-                noisegraph.plot(cpunoise.getCPUdata(), '-b',label='With Noise')
-
-                #cpu.legend(loc='upper right')
-                noisegraph.legend(loc='upper right')
-                key.legend(loc='upper right')
-
-                key.plot(s,'-g', label='Permuted S or T')
-                key.plot(t,'-r', label='Expanded Key')
                 
+                noisegraph.plot(cpunoise.getCPUdata(),'-b', label='With Noise')
+                noisegraph.legend(loc='upper right')
+
                 # Mark operation locations
                 
-                noisegraph.annotate('Init S', xy=(0, 1), xytext=(0, 2),
+                noisegraph.annotate('S', xy=(0, 1), xytext=(0, 2),
                     arrowprops=dict(facecolor='black', shrink=0.01),
                     )
-                noisegraph.annotate('Start Permutaiton', xy=(b, 1), xytext=(b+5, 2),
+                noisegraph.annotate('P', xy=(b, 1), xytext=(b+5, 2),
                     arrowprops=dict(facecolor='black', shrink=0.01),
                     )
             
-                noisegraph.annotate('Main Operations', xy=(d, 1), xytext=(d+5, 2),
+                noisegraph.annotate('MOP', xy=(d, 1), xytext=(d+2, 2),
                     arrowprops=dict(facecolor='black', shrink=0.01),
                     )
-                noisegraph.annotate('End RC4', xy=(len(cpustate.getCPUdata()), 1), xytext=(e+5, 2),
+                noisegraph.annotate('E', xy=(len(cpunoise.getCPUdata())-10, 1), xytext=(len(cpunoise.getCPUdata())-5, 2),
                     arrowprops=dict(facecolor='black', shrink=0.01),
                     )
 
-                print ('cpu',cpunoise.getCPUdata())
-                print ('time:', len(cpunoise.getCPUdata()))
-
+                print('Done')
                 show()

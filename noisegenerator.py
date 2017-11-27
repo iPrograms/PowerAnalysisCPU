@@ -4,9 +4,9 @@
     Author: Manzoor Ahmed 
           : Pierre Vachon
     Date created: 11/18/2017
-    Date last modified: 11/19/2017
+    Date last modified: 11/26/2017
     Python Version: 2.7-3.6
-    Version 1.0
+    Version 2.0
 '''
 from instructionrunner import InstructionRunner
 import hashlib
@@ -19,12 +19,11 @@ class NoiseGenerator:
         #hash key and get binary value
         self.hasheduserkey = bin(int(hashlib.sha256(str(userkey).encode('utf-8')).hexdigest(),16)).replace('0b','')
         self.hasheduserkey = list(map(int,self.hasheduserkey))
-        print(self.hasheduserkey)
         self.userkey = list(map(int,self.userkey))
         self.tempkey = [0,0,0,0,0,0,0]
         self.value = 0
         self.generatedvalues = []
-        self.noiseEnd = 500000 
+        self.noiseEnd = 500 
 
         self.start =0
         self.end = self.start + 7
@@ -195,7 +194,7 @@ class NoiseGenerator:
                 bits = bits + str(self.hasheduserkey[x])
             self.start = self.start + 7
             self.end   = self.end + 7
-        print('(s:e:b)',self.start, self.end,bits)
+        #print('(s:e:b)',self.start, self.end,bits)
 
         return int(bits,2)
         
@@ -222,7 +221,6 @@ class NoiseGenerator:
             
         finalnoise = self.runjumpinstruction(hashedkey7bits)
                  
-        print('noise:',finalnoise)
         return finalnoise
              
     def getNoiseValues(self):

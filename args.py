@@ -106,7 +106,7 @@ class InputChecker:
                       if (args[6] != ""):
                           if(args[6] == '-sys') or (args[6]) == '--system':
                               self.validArgs = True
-                              print 'valid command with monitoring system resources'
+                              print 'monitoring system resources, cpu.'
                               return True
                           else:
                               print 'Invalid argument -> ' + args[6]
@@ -121,10 +121,12 @@ class InputChecker:
                       self.extension = True
                       if (args[6] != ""):
                           if(args[6] == '-sys') or (args[6]) == '--system':
-                              if(args[7] == '-n') or (args[7] == '--noise'):
-                                  self.validArgs = True
-                                  print 'valid command with monitoring systemd resources with noise'
-                                  return True
+                              if(args[7] !=""):
+                                  if(args[7] == '-n') or (args[7] == '--noise'):
+                                      self.validArgs = True
+                                      print 'monitoring systemd resources with noise'
+                                      self.validArgs = True
+                                      return True
                               else:
                                   print 'Invalid argument -> ' + args[7]
                    else:
