@@ -51,7 +51,7 @@ s_key_figure = figure(1)
 # graphs
 key = s_key_figure.add_subplot(411)
 cpu = s_key_figure.add_subplot(714)
-noisegraph = s_key_figure.add_subplot(414)
+noisegraph = s_key_figure.add_subplot(616)
 
 
 # Y axis 0, to 10
@@ -571,6 +571,7 @@ if inpch.processCommand(sys.argv) == True:
         
                 print ('Permuting S...')
                 b = len(cpustate.getCPUdata()) - a
+                
                 initPermutationOfS(s,sysInfo,noise)
                 
                 c = len(cpustate.getCPUdata()) - b
@@ -630,7 +631,6 @@ if inpch.processCommand(sys.argv) == True:
                 t = initializeStateVector(s,k,True,True)
                 
                 print ('Permuting S with noise...')
-
                 b = len(cpunoise.getCPUdata()) - a
                 initPermutationOfS(s,True,True)
                 c = len(cpunoise.getCPUdata()) - b

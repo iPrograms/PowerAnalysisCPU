@@ -4,10 +4,11 @@
     Author: Manzoor Ahmed 
           : Pierre Vachon
     Date created: 11/18/2017
-    Date last modified: 11/26/2017
+    Date last modified: 11/28/2017
     Python Version: 2.7-3.6
     Version 2.0
 '''
+
 from instructionrunner import InstructionRunner
 import hashlib
 
@@ -16,17 +17,20 @@ class NoiseGenerator:
     def __init__(self,userkey):
         self.counter =0
         self.userkey = bin(int(userkey,16)).replace('0b','')
-        #hash key and get binary value
         self.hasheduserkey = bin(int(hashlib.sha256(str(userkey).encode('utf-8')).hexdigest(),16)).replace('0b','')
         self.hasheduserkey = list(map(int,self.hasheduserkey))
         self.userkey = list(map(int,self.userkey))
         self.tempkey = [0,0,0,0,0,0,0]
         self.value = 0
         self.generatedvalues = []
-        self.noiseEnd = 500 
+        self.noiseEnd = 500
+        self.prev = 0
+        self.flipindex = 0
+        self.swapindex = 0
 
         self.start =0
         self.end = self.start + 7
+        self.jumpinsttablesize = 32
 
         self.jumpinstructions = InstructionRunner()
 
@@ -60,144 +64,163 @@ class NoiseGenerator:
             finalnoisevalue = self.jumpinstructions.quad(value)
             self.generatedvalues.append(finalnoisevalue)
             
-        if value >= 6 and value <= 10 :
+        if value == 7:
             finalnoisevalue = self.jumpinstructions.equationOne(value)
             self.generatedvalues.append(finalnoisevalue)
             
-        if value >= 11 and value <= 20:
+        if value == 8:
             finalnoisevalue = self.jumpinstructions.equationTwo(value)
             self.generatedvalues.append(finalnoisevalue)
             
-        if value >= 21 and value <= 30:
+        if value == 9:
             finalnoisevalue = self.jumpinstructions.equationThree(value)
             self.generatedvalues.append(finalnoisevalue)
             
-        if value >= 31 and value <= 40:
+        if value == 10:
             finalnoisevalue = self.jumpinstructions.equationFour(value)
             self.generatedvalues.append(finalnoisevalue)
             
-        if value >= 41 and value <= 50:
+        if value == 11:
             finalnoisevalue = self.jumpinstructions.equationFive(value)
             self.generatedvalues.append(finalnoisevalue)
             
-        if value >= 51 and value <= 60:
+        if value == 12:
             finalnoisevalue = self.jumpinstructions.equationSix(value)
             self.generatedvalues.append(finalnoisevalue)
             
-        if value >= 61 and value <= 70:
+        if value == 13:
             finalnoisevalue = self.jumpinstructions.equationSeven(value)
             self.generatedvalues.append(finalnoisevalue)
             
-        if value >= 71 and value <= 80:
+        if value == 14:
             finalnoisevalue = self.jumpinstructions.equationEight(value)
             self.generatedvalues.append(finalnoisevalue)
             
-        if value >= 81 and value <= 90:
+        if value == 15:
             finalnoisevalue = self.jumpinstructions.equationNine(value)
             self.generatedvalues.append(finalnoisevalue)
             
-        if value >= 91 and value <= 100:
+        if value == 16:
             finalnoisevalue = self.jumpinstructions.equationTen(value)
             self.generatedvalues.append(finalnoisevalue)
             
-        if value >= 101 and value <= 110:
+        if value == 17:
             finalnoisevalue = self.jumpinstructions.equation11(value)
             self.generatedvalues.append(finalnoisevalue)
             
-        if value >= 111 and value <= 120:
+        if value == 18:
             finalnoisevalue = self.jumpinstructions.equation12(value)
             self.generatedvalues.append(finalnoisevalue)
             
-        if value >= 121 and value <= 130:
+        if value == 19:
             finalnoisevalue = self.jumpinstructions.equation14(value)
             self.generatedvalues.append(finalnoisevalue)
             
-        if value >= 131 and value <= 140:
+        if value == 20:
             finalnoisevalue = self.jumpinstructions.equation15(value)
             self.generatedvalues.append(finalnoisevalue)
             
-        if value >= 141 and value <= 150:
+        if value == 21:
             finalnoisevalue = self.jumpinstructions.equation16(value)
             self.generatedvalues.append(finalnoisevalue)
             
-        if value >= 151 and value <= 160:
+        if value == 22:
             finalnoisevalue = self.jumpinstructions.equation17(value)
             self.generatedvalues.append(finalnoisevalue)
             
-        if value >= 161 and value <= 170:
+        if value == 23:
             finalnoisevalue = self.jumpinstructions.equation18(value)
             self.generatedvalues.append(finalnoisevalue)
             
-        if value >= 171 and value <= 180:
+        if value == 24:
             finalnoisevalue = self.jumpinstructions.equation19(value)
             self.generatedvalues.append(finalnoisevalue)
             
-        if value >= 181 and value <= 190:
+        if value == 25:
             finalnoisevalue = self.jumpinstructions.equation20(value)
             self.generatedvalues.append(finalnoisevalue)
             
-        if value >= 191 and value <= 200:
+        if value == 26:
             finalnoisevalue = self.jumpinstructions.equation21(value)
             self.generatedvalues.append(finalnoisevalue)
             
-        if value >= 201 and value <= 400:
+        if value == 27:
             finalnoisevalue = self.jumpinstructions.equation22(value)
             self.generatedvalues.append(finalnoisevalue)
             
-        if value >= 401 and value <= 600:
+        if value == 28:
             finalnoisevalue = self.jumpinstructions.equation23(value)
             self.generatedvalues.append(finalnoisevalue)
             
-        if value >= 601 and value <= 800:
+        if value == 29:
             finalnoisevalue = self.jumpinstructions.equation24(value)
             self.generatedvalues.append(finalnoisevalue)
             
-        if value >= 801 and value <= 1000:
+        if value == 30:
             finalnoisevalue = self.jumpinstructions.equation25(value)
             self.generatedvalues.append(finalnoisevalue)
             
-        if value >= 1001 and value <= 2000:
+        if value == 32:
             finalnoisevalue = self.jumpinstructions.equation26(value)
-            self.generatedvalues.append(finalnoisevalue)
-            
-        if value >= 2001 and value <= 3000:
-            finalnoisevalue = self.jumpinstructions.equation27(value)
-            self.generatedvalues.append(finalnoisevalue)
-            
-        if value >= 3001 and value <= 4000:
-            finalnoisevalue = self.jumpinstructions.equation28(value)
-            self.generatedvalues.append(finalnoisevalue)
-            
-        if value >= 4001 and value <= 5000:
-            finalnoisevalue = self.jumpinstructions.equation29(value)
-            self.generatedvalues.append(finalnoisevalue)
-            
-        if value >= 5001 and value <= 6000:
-            finalnoisevalue = self.jumpinstructions.equation30(value)
-            self.generatedvalues.append(finalnoisevalue)
-            
-        if value >= 6001 and value <= 10000:
-            finalnoisevalue = self.jumpinstructions.equation31(value)
             self.generatedvalues.append(finalnoisevalue)
         return finalnoisevalue
 
+    def swapbits(self,start):
+        
+        # swap bit number 4 and 0
+        tmp = self.hasheduserkey[ start ]
+        self.hasheduserkey[ start ]  = self.hasheduserkey[ start + 3 ]
+        self.hasheduserkey[ start + 3 ]  = tmp
+        self.swapindex = self.swapindex + 7
+
+    def flipbits(self,start):
+        # flip bit 5
+        if self.hasheduserkey[ start + 4 ] == 1:
+	   self.hasheduserkey[ start + 4 ] =  0
+	   self.flipindex = self.flipindex + 7
+		
+	elif self.hasheduserkey[ start + 4 ] == 0:
+            self.hasheduserkey[ start  + 4 ] =  1
+            self.flipindex = self.flipindex + 7
+    
     def nextvalue(self):
         bits = ''
+        # Don't go over
         if (self.start + 7 > len(self.hasheduserkey)) or (self.end + 7 > len(self.hasheduserkey)):                                                         
             self.start = self.start + 7 % len(self.hasheduserkey)
             self.end   = self.end + 7   % len(self.hasheduserkey)
 
+            # Grab 7 bits 
             for x in range(self.start,self.end):
                 bits = bits + str(self.hasheduserkey[x % len(self.hasheduserkey)])
+
+            if self.swapindex + 3 >= len(self.hasheduserkey):
+                self.swapindex = 0
+            if self.flipindex + 4 >= len(self.hasheduserkey):
+                self.flipindex = 0
+
+            # flip and swap bits for next use
+            self.swapbits(self.swapindex)
+            self.flipbits(self.flipindex)
+                
         else:
             for x in range(self.start,self.end):
                 bits = bits + str(self.hasheduserkey[x])
+
+            if self.swapindex + 3 >= len(self.hasheduserkey):
+                self.swapindex = 0
+            if self.flipindex + 4 >= len(self.hasheduserkey):
+                self.flipindex = 0
+                
+            # flip and swap bits for next use
+            self.swapbits(self.swapindex)
+            self.flipbits(self.flipindex)
+                
             self.start = self.start + 7
             self.end   = self.end + 7
-        #print('(s:e:b)',self.start, self.end,bits)
-
+            
         return int(bits,2)
-        
+    
     def generateNoise(self):
         for x in range(1,self.noiseEnd):
             self.tempkey[0] = self.userkey[self.counter]
@@ -219,17 +242,13 @@ class NoiseGenerator:
 
         hashedkey7bits = self.nextvalue()
             
-        finalnoise = self.runjumpinstruction(hashedkey7bits)
-                 
+        noise = self.runjumpinstruction( hashedkey7bits % self.jumpinsttablesize)
+        finalnoise = noise + self.prev
+        self.prev = finalnoise  
+        
         return finalnoise
              
     def getNoiseValues(self):
         return self.generatedvalues
-    
-
-#noise = NoiseGenerator(8987777788776667765)
-#for x in range(0,30):
-#   noise.generateNoise()
-#print (noise.getNoiseValues())
 
 
