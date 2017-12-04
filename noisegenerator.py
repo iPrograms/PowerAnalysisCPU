@@ -37,131 +37,131 @@ class NoiseGenerator:
     def runjumpinstruction(self,value):
         finalnoisevalue = 0
         if value == 0:
-            finalnoisevalue = self.jumpinstructions.add(value)
+            finalnoisevalue = self.jumpinstructions.add()
             self.generatedvalues.append(finalnoisevalue)
             
         if value == 1:
-            finalnoisevalue = self.jumpinstructions.subtract(value)
+            finalnoisevalue = self.jumpinstructions.subtract()
             self.generatedvalues.append(finalnoisevalue)
             
         if value == 2:
-            finalnoisevalue = self.jumpinstructions.power2(value)
+            finalnoisevalue = self.jumpinstructions.power2()
             self.generatedvalues.append(finalnoisevalue)
             
         if value == 3:
-            finalnoisevalue = self.jumpinstructions.power3(value)
+            finalnoisevalue = self.jumpinstructions.power3()
             self.generatedvalues.append(finalnoisevalue)
             
         if value == 4:
-            finalnoisevalue = self.jumpinstructions.power4(value)
+            finalnoisevalue = self.jumpinstructions.power4()
             self.generatedvalues.append(finalnoisevalue)
             
         if value == 5:
-            finalnoisevalue = self.jumpinstructions.multipSelf(value)
+            finalnoisevalue = self.jumpinstructions.multipSelf()
             self.generatedvalues.append(finalnoisevalue)
             
         if value == 6:
-            finalnoisevalue = self.jumpinstructions.quad(value)
+            finalnoisevalue = self.jumpinstructions.quad()
             self.generatedvalues.append(finalnoisevalue)
             
         if value == 7:
-            finalnoisevalue = self.jumpinstructions.equationOne(value)
+            finalnoisevalue = self.jumpinstructions.equationOne()
             self.generatedvalues.append(finalnoisevalue)
             
-        if value == 8:
-            finalnoisevalue = self.jumpinstructions.equationTwo(value)
+        if  == 8:
+            finalnoisevalue = self.jumpinstructions.equationTwo(v)
             self.generatedvalues.append(finalnoisevalue)
             
         if value == 9:
-            finalnoisevalue = self.jumpinstructions.equationThree(value)
+            finalnoisevalue = self.jumpinstructions.equationThree()
             self.generatedvalues.append(finalnoisevalue)
             
         if value == 10:
-            finalnoisevalue = self.jumpinstructions.equationFour(value)
+            finalnoisevalue = self.jumpinstructions.equationFour()
             self.generatedvalues.append(finalnoisevalue)
             
         if value == 11:
-            finalnoisevalue = self.jumpinstructions.equationFive(value)
+            finalnoisevalue = self.jumpinstructions.equationFive()
             self.generatedvalues.append(finalnoisevalue)
             
         if value == 12:
-            finalnoisevalue = self.jumpinstructions.equationSix(value)
+            finalnoisevalue = self.jumpinstructions.equationSix()
             self.generatedvalues.append(finalnoisevalue)
             
         if value == 13:
-            finalnoisevalue = self.jumpinstructions.equationSeven(value)
+            finalnoisevalue = self.jumpinstructions.equationSeven()
             self.generatedvalues.append(finalnoisevalue)
             
         if value == 14:
-            finalnoisevalue = self.jumpinstructions.equationEight(value)
+            finalnoisevalue = self.jumpinstructions.equationEight()
             self.generatedvalues.append(finalnoisevalue)
             
         if value == 15:
-            finalnoisevalue = self.jumpinstructions.equationNine(value)
+            finalnoisevalue = self.jumpinstructions.equationNine()
             self.generatedvalues.append(finalnoisevalue)
             
         if value == 16:
-            finalnoisevalue = self.jumpinstructions.equationTen(value)
+            finalnoisevalue = self.jumpinstructions.equationTen()
             self.generatedvalues.append(finalnoisevalue)
             
         if value == 17:
-            finalnoisevalue = self.jumpinstructions.equation11(value)
+            finalnoisevalue = self.jumpinstructions.equation11()
             self.generatedvalues.append(finalnoisevalue)
             
         if value == 18:
-            finalnoisevalue = self.jumpinstructions.equation12(value)
+            finalnoisevalue = self.jumpinstructions.equation12()
             self.generatedvalues.append(finalnoisevalue)
             
         if value == 19:
-            finalnoisevalue = self.jumpinstructions.equation14(value)
+            finalnoisevalue = self.jumpinstructions.equation14()
             self.generatedvalues.append(finalnoisevalue)
             
         if value == 20:
-            finalnoisevalue = self.jumpinstructions.equation15(value)
+            finalnoisevalue = self.jumpinstructions.equation15()
             self.generatedvalues.append(finalnoisevalue)
             
         if value == 21:
-            finalnoisevalue = self.jumpinstructions.equation16(value)
+            finalnoisevalue = self.jumpinstructions.equation16()
             self.generatedvalues.append(finalnoisevalue)
             
         if value == 22:
-            finalnoisevalue = self.jumpinstructions.equation17(value)
+            finalnoisevalue = self.jumpinstructions.equation17()
             self.generatedvalues.append(finalnoisevalue)
             
         if value == 23:
-            finalnoisevalue = self.jumpinstructions.equation18(value)
+            finalnoisevalue = self.jumpinstructions.equation18()
             self.generatedvalues.append(finalnoisevalue)
             
         if value == 24:
-            finalnoisevalue = self.jumpinstructions.equation19(value)
+            finalnoisevalue = self.jumpinstructions.equation19()
             self.generatedvalues.append(finalnoisevalue)
             
         if value == 25:
-            finalnoisevalue = self.jumpinstructions.equation20(value)
+            finalnoisevalue = self.jumpinstructions.equation20()
             self.generatedvalues.append(finalnoisevalue)
             
         if value == 26:
-            finalnoisevalue = self.jumpinstructions.equation21(value)
+            finalnoisevalue = self.jumpinstructions.equation21()
             self.generatedvalues.append(finalnoisevalue)
             
         if value == 27:
-            finalnoisevalue = self.jumpinstructions.equation22(value)
+            finalnoisevalue = self.jumpinstructions.equation22()
             self.generatedvalues.append(finalnoisevalue)
             
         if value == 28:
-            finalnoisevalue = self.jumpinstructions.equation23(value)
+            finalnoisevalue = self.jumpinstructions.equation23()
             self.generatedvalues.append(finalnoisevalue)
             
         if value == 29:
-            finalnoisevalue = self.jumpinstructions.equation24(value)
+            finalnoisevalue = self.jumpinstructions.equation24()
             self.generatedvalues.append(finalnoisevalue)
             
         if value == 30:
-            finalnoisevalue = self.jumpinstructions.equation25(value)
+            finalnoisevalue = self.jumpinstructions.equation25()
             self.generatedvalues.append(finalnoisevalue)
             
         if value == 32:
-            finalnoisevalue = self.jumpinstructions.equation26(value)
+            finalnoisevalue = self.jumpinstructions.equation26()
             self.generatedvalues.append(finalnoisevalue)
         return finalnoisevalue
 
@@ -222,6 +222,7 @@ class NoiseGenerator:
         return int(bits,2)
     
     def generateNoise(self):
+        # Start genererating 
         for x in range(1,self.noiseEnd):
             self.tempkey[0] = self.userkey[self.counter]
             (self.userkey[self.counter]) = ((self.userkey[self.counter]) != 1)
@@ -246,7 +247,7 @@ class NoiseGenerator:
         finalnoise = noise + self.prev
         self.prev = finalnoise  
         
-        return finalnoise
+        return finalnoise # This value determines which jump instruction should be run
              
     def getNoiseValues(self):
         return self.generatedvalues
