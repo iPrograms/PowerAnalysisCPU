@@ -1,5 +1,19 @@
-#the input key is in binary, for this simulation
-key = [True, False, True, True, False, False, True, True, False, False, True, True, False, False, True, True, False, False, True, True, False, False, True, True, False, False, True, True, False, False, True, True, True, False, True, True, False, False, True, True, False, False, True, True, False, False, True, True, False, False, True, True, False, False, True, True, False, False, True, True, False, False, True, True, True, False, True, True, False, False, True, True, False, False, True, True, False, False, True, True, False, False, True, True, False, False, True, True, False, False, True, True, False, False, True, True, True, False, True, True, False, False, True, True, False, False, True, True, False, False, True, True, False, False, True, True, False, False, True, True, False, False, True, True, False, False, True, True, True, False, True, True, False, False, True, True, False, False, True, True, False, False, True, True, False, False, True, True, False, False, True, True, False, False, True, True, False, False, True, True, True, False, True, True, False, False, True, True, False, False, True, True, False, False, True, True, False, False, True, True, False, False, True, True, False, False, True, True, False, False, True, True, True, False, True, True, False, False, True, True, False, False, True, True, False, False, True, True, False, False, True, True, False, False, True, True, False, False, True, True, False, False, True, True, True, False, True, True, False, False, True, True, False, False, True, True, False, False, True, True, False, False, True, True, False, False, True, True, False, False, True, True, False, False, True, True]
+#!/usr/bin/env python2.7
+'''
+    File name: noiseFucntionTest.py
+    Author: Pierre Vachon
+    Date created: 11/18/2017
+    Date last modified: 12/23/2017
+    Python Version: 2.7-3.6
+    Version 3.0
+'''
+
+# One single test of random noise generator from key example. 
+
+# Assume user's key
+
+key = [True, False, True
+       , True, False, False, True, True, False, False, True, True, False, False, True, True, False, False, True, True, False, False, True, True, False, False, True, True, False, False, True, True, True, False, True, True, False, False, True, True, False, False, True, True, False, False, True, True, False, False, True, True, False, False, True, True, False, False, True, True, False, False, True, True, True, False, True, True, False, False, True, True, False, False, True, True, False, False, True, True, False, False, True, True, False, False, True, True, False, False, True, True, False, False, True, True, True, False, True, True, False, False, True, True, False, False, True, True, False, False, True, True, False, False, True, True, False, False, True, True, False, False, True, True, False, False, True, True, True, False, True, True, False, False, True, True, False, False, True, True, False, False, True, True, False, False, True, True, False, False, True, True, False, False, True, True, False, False, True, True, True, False, True, True, False, False, True, True, False, False, True, True, False, False, True, True, False, False, True, True, False, False, True, True, False, False, True, True, False, False, True, True, True, False, True, True, False, False, True, True, False, False, True, True, False, False, True, True, False, False, True, True, False, False, True, True, False, False, True, True, False, False, True, True, True, False, True, True, False, False, True, True, False, False, True, True, False, False, True, True, False, False, True, True, False, False, True, True, False, False, True, True, False, False, True, True]
 tempkey = [False, False, False, False, False, False, False]
 value = 0
 counter = 0
@@ -19,9 +33,11 @@ for i in range (1, 500000):
 	tempkey[3] = key[(counter+3)%keylength]
 	tempkey[4] = key[(counter+4)%keylength]
 	tempkey[5] = key[(counter+5)%keylength]
+
 	#bit flip
 	key[(counter+5)%keylength] = (key[(counter+5)%keylength] != 1)
 	tempkey[6] = key[(counter+6)%keylength]
+
 	#swap values
 	key[counter] = tempkey[4]
 	key[(counter+4)%keylength] = tempkey[0]

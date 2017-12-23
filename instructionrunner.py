@@ -4,12 +4,12 @@
     Author: Manzoor Ahmed 
           : Pierre Vachon
     Date created: 11/15/2017
-    Date last modified: 11/15/2017
+    Date last modified: 12/22/2017
     Python Version: 2.7-3.6
     Version 1.0
 '''
 
-#InstructionRunner: Runs the following instructions at a given time
+# InstructionRunner: Runs the following instructions to consume CPU usage for noise
 
 class InstructionRunner:
 
@@ -36,6 +36,8 @@ class InstructionRunner:
     # noisevalue raised to self
     def multipSelf(self):
         return 9999 ** 3
+
+    # Other equations to run
     
     def quad(self):
         return 34 + 2 * 4
@@ -121,7 +123,7 @@ class InstructionRunner:
     def equation27(self):
         return 33333333 / 12 % 3
 
-    def equation28(self,noisevalue):
+    def equation28(self):
         return 9999999999999 + 1 % 7 * 12
 
     def equation29(self):

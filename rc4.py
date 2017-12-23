@@ -1,10 +1,13 @@
 #!/usr/bin/env python2.7
 '''
+    Encrypts and decrypts files using RC4 streaming
+    algorithm to monitor systems resources
+    
     File name: rc4.py
     Author: Manzoor Ahmed 
           : Pierre Vachon
     Date created: 10/20/2017
-    Date last modified: 11/26/2017
+    Date last modified: 12/23/2017
     Python Version: 2.7-3.6
     Version 3.0
 '''
@@ -25,13 +28,15 @@ from matplotlib.pyplot import figure,show
 
 # Current process
 proc = psutil.Process(os.getpid())
-# private key, degits
+
+# Private key, degits
 if len(sys.argv) >=7:
         ng = NoiseGenerator(sys.argv[3])
 
 cpustate = CPUStat()
 cpunoise = CPUStat()
 
+# Don't need to moinitor every single cpu
 percpu  = False
 sysInfo = False
 noise   = False
@@ -69,7 +74,7 @@ noisegraph.grid(True)
 key.grid(True)
 
 
-# Labels
+# Graph Labels
 cpu.set_ylabel('Percentage')
 cpu.set_xlabel('Time (milisecond)')
 cpu.set_title('CPU')
@@ -82,6 +87,7 @@ key.set_ylabel('Value')
 key.set_xlabel('Round')
 key.set_title('S, Key, T')
 
+# Collect regular cpu usage without noise 
 def collectSystemData():
         # Capture cpu usage
         cpustate.addCPUInterval(proc.cpu_percent(interval=0.01) / psutil.cpu_count())
@@ -89,7 +95,8 @@ def collectSystemData():
 def collectNoiseData():
         # Caputer cpu usage with noise
         cpunoise.addCPUInterval(proc.cpu_percent(interval=0.01) / psutil.cpu_count())
-        
+
+# RC4 Algorithm starts...
 # Populate S with data 0,...256
 def initializeStateVector(s,k,monitor=False, noise=False):
         t = []
@@ -126,6 +133,7 @@ def initializeStateVector(s,k,monitor=False, noise=False):
                         t.append(int(k[i % len(k) ]))                
         return t
 
+# RC4 swapping...
 # Swap S data for permutaion
 def swap(i,j,monitor=False,noise=False):
 
@@ -153,7 +161,8 @@ def swap(i,j,monitor=False,noise=False):
                 s[i] = s[j]
                 collectSystemData()
                 s[j] = temp
-        
+                
+# RC4, permute S
 def initPermutationOfS(s,monitor=False,noise=False):
         j=0
         if monitor == True:
@@ -180,6 +189,7 @@ def initPermutationOfS(s,monitor=False,noise=False):
                     # swap also monitors sys info internaly
                     swap(s[x],s[j],sysInfo)
 
+# Encryption
 # Encrypt M byte of data with stream key
 def encrypt(data,key, monitor=False,noise=False):
 
@@ -216,7 +226,8 @@ def encrypt(data,key, monitor=False,noise=False):
                 encrypt_hex = binascii.hexlify(encrypted_hex)
         return encrypted_hex
 
-# Decrypt
+# Decryption
+# Decrypt m bytes of data with stream key
 def decrypt(data,key, monitor=False,noise=False):
 
         if monitor == False:
@@ -244,7 +255,8 @@ def decrypt(data,key, monitor=False,noise=False):
                 collectNoiseData()
                 to_hex = hex(dec_val)
 
-                # Don't need to monitor, not part of algorithm
+                # Don't need to monitor system resouce at this point, not part of the RC4 algorithm
+                # Regular operation
                 try:
                         if to_hex.endswith('L'):
                                 original_val = binascii.unhexlify(to_hex[2:len(to_hex) -1 ].strip())
@@ -291,7 +303,7 @@ def streamData(command,key,streamData,sysInfo,noise):
                                         if not chunk:
                                                 break
                                         else:
-                                                # Keep generating key 
+                                                # Keep generating stream key 
                                                 a = ( a + 1 ) % 256
                                                 b = ( b + s[b] )  % 256
                                                 swap( s[ a ], s[ b ])
@@ -304,7 +316,12 @@ def streamData(command,key,streamData,sysInfo,noise):
                                                 # Encrypt chunk with stream key
                                                 
                                                 encrpted_chunk = encrypt(chunk,round_key,sysInfo)
+
                                                 # Change file extension
+                                                # Instead we need to keep just the shell of the file, not by
+                                                # generating a new file everytime.
+                                                # For demo just proceed with new file each time.
+                                                
                                                 file_with_ext = streamData +  '.encrypted'
                                                 
                                                 # Append data
@@ -340,6 +357,10 @@ def streamData(command,key,streamData,sysInfo,noise):
                                         
                                                 # Get pathname
                                                 abspath = os.path.abspath(file_with_ext)
+
+                                                # Get file's path name
+                                                # Create a copy of the unencrypted file for demo, not the best way but does the job
+                                                # Best way, append to the shell and change extension.
                                                 
                                                 basename = os.path.basename(file_with_ext)
                                                 copy = abspath.replace(basename,'') + 'Copy_' + basename.replace('.encrypted','')
@@ -597,7 +618,11 @@ if inpch.processCommand(sys.argv) == True:
                 key.plot(t,'-r', label='Expanded Key')
                 key.legend(loc='upper right')
                 
-                # Mark operation locations
+                # Mark operation locations on the graph
+                # S, setting up S
+                # P, permutaion starts
+                # MOP, main algorithm operations starts
+                # E, end of algorithm
                 
                 cpu.annotate('S', xy=(0, 1), xytext=(0, 2),
                     arrowprops=dict(facecolor='black', shrink=0.01),
@@ -613,7 +638,7 @@ if inpch.processCommand(sys.argv) == True:
                     arrowprops=dict(facecolor='black', shrink=0.01),
                     )
 
-                # Regular CPu monitoring Done
+                # Regular CPU monitoring Done
 
                 #--------------------------------------------------------------
                 # Round 2 with noise
@@ -667,4 +692,6 @@ if inpch.processCommand(sys.argv) == True:
                     )
 
                 print('Done')
+                
+                # Show GUI 
                 show()
